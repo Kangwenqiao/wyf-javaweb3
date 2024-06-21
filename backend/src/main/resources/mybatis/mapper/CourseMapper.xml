@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mw.education.dao.CourseMapper">
+    <resultMap id="BaseResultMap" type="com.mw.education.domain.Course">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="term_id" property="termId" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, code, term_id, remark
+    </sql>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM course WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.mw.education.domain.Course">
+        INSERT INTO course (name, code, term_id, remark)
+        VALUES (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{termId,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT <include refid="Base_Column_List" />
+        FROM course
+        WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM course
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.Course">
+        UPDATE course
+        SET name = #{name,jdbcType=VARCHAR},
+            code = #{code,jdbcType=VARCHAR},
+            term_id = #{termId,jdbcType=INTEGER},
+            remark = #{remark,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

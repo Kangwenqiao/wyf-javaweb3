@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mw.education.dao.StudentMapper">
+
+    <resultMap id="StudentAndClassAndSpecialityAndCollegeResultMap" type="com.mw.education.domain.compose.StudentAndClassAndSpecialityAndCollege">
+        <id property="student.id" column="student_id"/>
+        <result property="student.name" column="student_name"/>
+        <result property="student.password" column="student_password"/>
+        <result property="student.code" column="student_code"/>
+        <result property="student.classId" column="student_class_id"/>
+        <result property="student.remark" column="student_remark"/>
+
+        <result property="classGroup.id" column="class_id"/>
+        <result property="classGroup.name" column="class_name"/>
+        <result property="classGroup.code" column="class_code"/>
+        <result property="classGroup.specialityId" column="class_speciality_id"/>
+        <result property="classGroup.remark" column="class_remark"/>
+
+        <result property="speciality.id" column="speciality_id"/>
+        <result property="speciality.name" column="speciality_name"/>
+        <result property="speciality.grade" column="speciality_grade"/>
+        <result property="speciality.code" column="speciality_code"/>
+        <result property="speciality.collegeId" column="speciality_college_id"/>
+        <result property="speciality.remark" column="speciality_remark"/>
+
+        <result property="college.id" column="college_id"/>
+        <result property="college.name" column="college_name"/>
+        <result property="college.remark" column="college_remark"/>
+    </resultMap>
+
+    <select id="selectAllWithDetails" resultMap="StudentAndClassAndSpecialityAndCollegeResultMap">
+        SELECT
+            s.id as student_id, s.name as student_name, s.password as student_password, s.code as student_code, s.class_id as student_class_id, s.remark as student_remark,
+            c.id as class_id, c.name as class_name, c.code as class_code, c.speciality_id as class_speciality_id, c.remark as class_remark,
+            sp.id as speciality_id, sp.name as speciality_name, sp.grade as speciality_grade, sp.code as speciality_code, sp.college_id as speciality_college_id, sp.remark as speciality_remark,
+            co.id as college_id, co.name as college_name, co.remark as college_remark
+        FROM student s
+                 LEFT JOIN class c ON s.class_id = c.id
+                 LEFT JOIN speciality sp ON c.speciality_id = sp.id
+                 LEFT JOIN college co ON sp.college_id = co.id
+    </select>
+
+    <select id="selectByIdWithDetails" resultMap="StudentAndClassAndSpecialityAndCollegeResultMap" parameterType="java.lang.Integer">
+        SELECT
+            s.id as student_id, s.name as student_name, s.password as student_password, s.code as student_code, s.class_id as student_class_id, s.remark as student_remark,
+            c.id as class_id, c.name as class_name, c.code as class_code, c.speciality_id as class_speciality_id, c.remark as class_remark,
+            sp.id as speciality_id, sp.name as speciality_name, sp.grade as speciality_grade, sp.code as speciality_code, sp.college_id as speciality_college_id, sp.remark as speciality_remark,
+            co.id as college_id, co.name as college_name, co.remark as college_remark
+        FROM student s
+                 LEFT JOIN class c ON s.class_id = c.id
+                 LEFT JOIN speciality sp ON c.speciality_id = sp.id
+                 LEFT JOIN college co ON sp.college_id = co.id
+        WHERE s.id = #{id}
+    </select>
+
+    <!-- 新增的通过学号获取学生详细信息的查询 -->
+    <select id="selectByCodeWithDetails" resultMap="StudentAndClassAndSpecialityAndCollegeResultMap" parameterType="java.lang.String">
+        SELECT
+            s.id as student_id, s.name as student_name, s.password as student_password, s.code as student_code, s.class_id as student_class_id, s.remark as student_remark,
+            c.id as class_id, c.name as class_name, c.code as class_code, c.speciality_id as class_speciality_id, c.remark as class_remark,
+            sp.id as speciality_id, sp.name as speciality_name, sp.grade as speciality_grade, sp.code as speciality_code, sp.college_id as speciality_college_id, sp.remark as speciality_remark,
+            co.id as college_id, co.name as college_name, co.remark as college_remark
+        FROM student s
+                 LEFT JOIN class c ON s.class_id = c.id
+                 LEFT JOIN speciality sp ON c.speciality_id = sp.id
+                 LEFT JOIN college co ON sp.college_id = co.id
+        WHERE s.code = #{code}
+    </select>
+
+    <insert id="insert" parameterType="com.mw.education.domain.Student">
+        INSERT INTO student (name, password, code, class_id, remark)
+        VALUES (#{name}, #{password}, #{code}, #{classId}, #{remark})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.Student">
+        UPDATE student
+        SET name = #{name},
+            password = #{password},
+            code = #{code},
+            class_id = #{classId},
+            remark = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM student WHERE id = #{id}
+    </delete>
+
+    <select id="selectByPrimaryKey" resultType="com.mw.education.domain.Student" parameterType="java.lang.Integer">
+        SELECT id, name, password, code, class_id, remark
+        FROM student
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.mw.education.domain.Student">
+        SELECT id, name, password, code, class_id, remark
+        FROM student
+    </select>
+
+</mapper>

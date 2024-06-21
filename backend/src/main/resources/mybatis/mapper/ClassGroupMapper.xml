@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mw.education.dao.ClassGroupMapper">
+
+    <resultMap id="ClassGroupResultMap" type="com.mw.education.domain.ClassGroup">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="specialityId" column="speciality_id"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <resultMap id="ClassGroupAndSpecialityAndCollegeResultMap" type="com.mw.education.domain.compose.ClassGroupAndSpecialityAndCollege">
+        <id property="classGroup.id" column="id"/>
+        <result property="classGroup.name" column="name"/>
+        <result property="classGroup.code" column="code"/>
+        <result property="classGroup.specialityId" column="speciality_id"/>
+        <result property="classGroup.remark" column="remark"/>
+
+        <result property="speciality.id" column="speciality_id"/>
+        <result property="speciality.name" column="speciality_name"/>
+        <result property="speciality.grade" column="speciality_grade"/>
+        <result property="speciality.code" column="speciality_code"/>
+        <result property="speciality.collegeId" column="speciality_college_id"/>
+        <result property="speciality.remark" column="speciality_remark"/>
+
+        <result property="college.id" column="college_id"/>
+        <result property="college.name" column="college_name"/>
+        <result property="college.remark" column="college_remark"/>
+    </resultMap>
+
+    <select id="selectByPrimaryKey" resultMap="ClassGroupResultMap">
+        SELECT * FROM class WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="ClassGroupResultMap">
+        SELECT * FROM class
+    </select>
+
+    <select id="selectByPrimaryKeyJoinedSpecialityAndCollege" resultMap="ClassGroupAndSpecialityAndCollegeResultMap">
+        SELECT c.*, s.name AS speciality_name, s.grade AS speciality_grade, s.code AS speciality_code,
+               s.college_id AS speciality_college_id, s.remark AS speciality_remark,
+               co.name AS college_name, co.remark AS college_remark
+        FROM class c
+                 LEFT JOIN speciality s ON c.speciality_id = s.id
+                 LEFT JOIN college co ON s.college_id = co.id
+        WHERE c.id = #{id}
+    </select>
+
+    <select id="selectAllJoinedSpecialityAndCollege" resultMap="ClassGroupAndSpecialityAndCollegeResultMap">
+        SELECT c.*, s.name AS speciality_name, s.grade AS speciality_grade, s.code AS speciality_code,
+               s.college_id AS speciality_college_id, s.remark AS speciality_remark,
+               co.name AS college_name, co.remark AS college_remark
+        FROM class c
+                 LEFT JOIN speciality s ON c.speciality_id = s.id
+                 LEFT JOIN college co ON s.college_id = co.id
+    </select>
+
+    <insert id="insert" parameterType="com.mw.education.domain.ClassGroup">
+        INSERT INTO class (name, code, speciality_id, remark)
+        VALUES (#{name}, #{code}, #{specialityId}, #{remark})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.ClassGroup">
+        UPDATE class
+        SET name = #{name}, code = #{code}, speciality_id = #{specialityId}, remark = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM class WHERE id = #{id}
+    </delete>
+
+</mapper>

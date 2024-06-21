@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mw.education.dao.TermMapper">
+    <resultMap id="BaseResultMap" type="com.mw.education.domain.Term">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="start_date" jdbcType="DATE" property="startDate" />
+        <result column="end_date" jdbcType="DATE" property="endDate" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, start_date, end_date, remark
+    </sql>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM term WHERE id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.mw.education.domain.Term">
+        INSERT INTO term (name, start_date, end_date, remark)
+        VALUES (#{name}, #{startDate}, #{endDate}, #{remark})
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM term
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM term
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.Term">
+        UPDATE term
+        SET name = #{name},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            remark = #{remark}
+        WHERE id = #{id}
+    </update>
+</mapper>

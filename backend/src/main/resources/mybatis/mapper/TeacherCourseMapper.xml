@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mw.education.dao.TeacherCourseMapper">
+
+    <resultMap id="CourseResultMap" type="com.mw.education.domain.Course">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="term_id" property="termId" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.mw.education.domain.TeacherCourse">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="teacher_id" property="teacherId" jdbcType="INTEGER"/>
+        <result column="course_id" property="courseId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, teacher_id, course_id
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List" />
+        from teacher_course
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from teacher_course
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from teacher_course
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.mw.education.domain.TeacherCourse">
+        insert into teacher_course (teacher_id, course_id)
+        values (#{teacherId,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.TeacherCourse">
+        update teacher_course
+        set teacher_id = #{teacherId,jdbcType=INTEGER},
+            course_id = #{courseId,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByTeacherId" resultMap="CourseResultMap">
+        SELECT c.*
+        FROM course c
+                 INNER JOIN teacher_course tc ON c.id = tc.course_id
+        WHERE tc.teacher_id = #{teacherId}
+    </select>
+
+    <select id="selectTeachersByCourseId" resultType="com.mw.education.domain.Teacher">
+        SELECT t.*
+        FROM teacher t
+                 JOIN teacher_course tc ON t.id = tc.teacher_id
+        WHERE tc.course_id = #{courseId}
+    </select>
+
+    <select id="countByTeacherId" resultType="int">
+        SELECT COUNT(*)
+        FROM teacher_course
+        WHERE teacher_id = #{teacherId}
+    </select>
+
+    <delete id="deleteByTeacherId" parameterType="int">
+        DELETE
+        FROM teacher_course
+        WHERE teacher_id = #{teacherId}
+    </delete>
+
+</mapper>

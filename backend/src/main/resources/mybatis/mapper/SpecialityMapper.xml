@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mw.education.dao.SpecialityMapper">
+
+    <resultMap id="SpecialityResultMap" type="com.mw.education.domain.Speciality">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="grade" column="grade"/>
+        <result property="code" column="code"/>
+        <result property="collegeId" column="college_id"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="selectByPrimaryKey" resultMap="SpecialityResultMap">
+        SELECT * FROM speciality WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="SpecialityResultMap">
+        SELECT * FROM speciality
+    </select>
+
+    <insert id="insert">
+        INSERT INTO speciality (name, grade, code, college_id, remark)
+        VALUES (#{name}, #{grade}, #{code}, #{collegeId}, #{remark})
+    </insert>
+
+    <update id="updateByPrimaryKey">
+        UPDATE speciality
+        SET name = #{name}, grade = #{grade}, code = #{code}, college_id = #{collegeId}, remark = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM speciality WHERE id = #{id}
+    </delete>
+
+    <resultMap id="SpecialityAndCollegeResultMap" type="com.mw.education.domain.compose.SpecialityAndCollege">
+        <id property="speciality.id" column="id"/>
+        <result property="speciality.name" column="name"/>
+        <result property="speciality.grade" column="grade"/>
+        <result property="speciality.code" column="code"/>
+        <result property="speciality.collegeId" column="college_id"/>
+        <result property="speciality.remark" column="remark"/>
+        <result property="college.name" column="college_name"/>
+    </resultMap>
+
+    <select id="selectByPrimaryKeyJoinedCollege" resultMap="SpecialityAndCollegeResultMap">
+        SELECT s.id, s.name, s.grade, s.code, s.college_id, s.remark, c.name AS college_name
+        FROM speciality s
+                 JOIN college c ON s.college_id = c.id
+        WHERE s.id = #{id}
+    </select>
+
+    <select id="selectAllJoinedCollege" resultMap="SpecialityAndCollegeResultMap">
+        SELECT s.id, s.name, s.grade, s.code, s.college_id, s.remark, c.name AS college_name
+        FROM speciality s
+                 JOIN college c ON s.college_id = c.id
+    </select>
+
+</mapper>
