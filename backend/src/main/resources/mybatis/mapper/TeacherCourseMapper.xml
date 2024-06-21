@@ -77,4 +77,13 @@
         WHERE teacher_id = #{teacherId}
     </delete>
 
+    <select id="selectTeacherCoursesByTeacherId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        teacher_course
+        WHERE
+        teacher_id = #{teacherId}
+    </select>
+
 </mapper>

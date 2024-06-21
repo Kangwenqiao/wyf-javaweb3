@@ -25,4 +25,7 @@ public interface TeacherCourseMapper {
     int countByTeacherId(@Param("teacherId") int teacherId);
 
     void deleteByTeacherId(@Param("teacherId") int teacherId);
+
+    List<TeacherCourse> selectTeacherCoursesByTeacherId(@Param("teacherId") int teacherId);
+
 }

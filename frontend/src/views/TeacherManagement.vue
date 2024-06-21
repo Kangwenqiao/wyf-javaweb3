@@ -15,10 +15,11 @@
       <el-table-column prop="name" label="姓名" width="180"></el-table-column>
       <el-table-column prop="code" label="工号" width="180"></el-table-column>
       <el-table-column prop="collegeName" label="学院" width="180"></el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="240">
         <template v-slot="scope">
           <el-button @click="editTeacher(scope.row)" type="primary" size="small">编辑</el-button>
           <el-button @click="deleteTeacher(scope.row.id)" type="danger" size="small">删除</el-button>
+          <el-button @click="assignCourse(scope.row)" type="success" size="small">分配课程</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,6 +52,35 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+
+    <!-- 分配课程对话框 -->
+    <el-dialog v-model="assignCourseDialogVisible" title="分配课程">
+      <el-table :data="assignedCourses" style="width: 100%">
+        <el-table-column prop="name" label="课程名称" width="180"></el-table-column>
+        <el-table-column prop="term.name" label="学期" width="180"></el-table-column>
+        <el-table-column prop="remark" label="课程备注" width="180"></el-table-column>
+        <el-table-column label="操作" width="180">
+          <template v-slot="scope">
+            <el-button @click="removeCourse(scope.row)" type="danger" size="small">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-form>
+        <el-form-item label="选择课程">
+          <el-select v-model="selectedCourseId" placeholder="选择课程">
+            <el-option
+                v-for="course in availableCourses"
+                :key="course.id"
+                :label="course.name"
+                :value="course.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addCourse">添加课程</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -71,6 +101,11 @@ export default {
         collegeId: ''
       },
       dialogVisible: false,
+      assignCourseDialogVisible: false,
+      selectedTeacher: null,
+      assignedCourses: [],
+      availableCourses: [],
+      selectedCourseId: null,
       search: '',
       rules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
@@ -161,6 +196,79 @@ export default {
       }).catch(() => {
         this.$message.info('已取消删除');
       });
+    },
+    assignCourse(teacher) {
+      this.selectedTeacher = teacher;
+      this.assignCourseDialogVisible = true;
+      this.fetchAssignedCourses(teacher.id);
+      this.fetchAvailableCourses();
+    },
+    fetchAssignedCourses(teacherId) {
+      apiClient.get(`/teacherCourse/teacher/${teacherId}/courses`)
+          .then(response => {
+            const coursePromises = response.data.map(course =>
+                apiClient.get(`/terms/${course.termId}`)
+                    .then(termResponse => ({
+                      ...course,
+                      term: termResponse.data
+                    }))
+            );
+            Promise.all(coursePromises)
+                .then(courses => {
+                  this.assignedCourses = courses;
+                });
+          })
+          .catch(error => {
+            console.error('获取教师课程信息时出错:', error);
+          });
+    },
+    fetchAvailableCourses() {
+      apiClient.get('/courses')
+          .then(response => {
+            this.availableCourses = response.data;
+          })
+          .catch(error => {
+            console.error('获取课程信息时出错:', error);
+          });
+    },
+    addCourse() {
+      if (this.assignedCourses.some(course => course.id === this.selectedCourseId)) {
+        this.$message.error('该课程已分配给教师，不能重复添加');
+        return;
+      }
+      const courseAssignment = {
+        teacherId: this.selectedTeacher.id,
+        courseId: this.selectedCourseId
+      };
+      apiClient.post('/teacherCourse/add', courseAssignment)
+          .then(() => {
+            this.$message.success('课程分配成功');
+            this.fetchAssignedCourses(this.selectedTeacher.id);
+          })
+          .catch(error => {
+            console.error('课程分配时出错:', error);
+            this.$message.error('课程分配时发生错误');
+          });
+    },
+    removeCourse(course) {
+      apiClient.get(`/teacherCourse/teacher/${this.selectedTeacher.id}/teacherCourses`)
+          .then(response => {
+            const assignment = response.data.find(c => c.courseId === course.id);
+            if (assignment) {
+              apiClient.delete(`/teacherCourse/delete/${assignment.id}`)
+                  .then(() => {
+                    this.$message.success('课程删除成功');
+                    this.fetchAssignedCourses(this.selectedTeacher.id);
+                  })
+                  .catch(error => {
+                    console.error('课程删除时出错:', error);
+                    this.$message.error('课程删除时发生错误');
+                  });
+            }
+          })
+          .catch(error => {
+            console.error('获取教师课程信息时出错:', error);
+          });
     }
   },
   mounted() {

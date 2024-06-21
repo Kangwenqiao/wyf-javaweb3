@@ -49,4 +49,10 @@ public class TeacherCourseController {
     public List<Teacher> getTeachersByCourseId(@PathVariable Integer courseId) {
         return teacherCourseService.getTeachersByCourseId(courseId);
     }
+
+    // 新添加的方法
+    @GetMapping("/teacher/{teacherId}/teacherCourses")
+    public List<TeacherCourse> getTeacherCoursesByTeacherId(@PathVariable int teacherId) {
+        return teacherCourseService.getByTeacherId(teacherId);
+    }
 }

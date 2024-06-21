@@ -10,6 +10,7 @@ import TeacherInfo from '../views/TeacherInfo.vue';
 import ClassManagement from '../views/ClassManagement.vue'; // Import the ClassManagement component
 
 const routes = [
+    { path: '/login', name: 'Login', component: Login },
     { path: '/', name: 'Home', component: HomeView, meta: { requiresAuth: true } },
     { path: '/teacherManagement', name: 'TeacherManagement', component: TeacherManagement, meta: { requiresAuth: true, role: 'dean' } },
     { path: '/studentManagement', name: 'StudentManagement', component: StudentManagement, meta: { requiresAuth: true, role: 'dean' } },
@@ -18,7 +19,7 @@ const routes = [
     { path: '/studentCourseManagement', name: 'StudentCourseManagement', component: StudentCourseManagement, meta: { requiresAuth: true, role: 'student' } },
     { path: '/teacherInfo', name: 'TeacherInfo', component: TeacherInfo, meta: { requiresAuth: true, role: 'teacher' } },
     { path: '/classManagement', name: 'ClassManagement', component: ClassManagement, meta: { requiresAuth: true, role: 'dean' } }, // Add new route
-    { path: '/login', name: 'Login', component: Login }
+
 ];
 
 const router = createRouter({

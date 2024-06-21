@@ -41,4 +41,9 @@ public class TeacherCourseService {
     public List<Teacher> getTeachersByCourseId(Integer courseId) {
         return teacherCourseMapper.selectTeachersByCourseId(courseId);
     }
+
+    // 新添加的方法
+    public List<TeacherCourse> getByTeacherId(int teacherId) {
+        return teacherCourseMapper.selectTeacherCoursesByTeacherId(teacherId);
+    }
 }
