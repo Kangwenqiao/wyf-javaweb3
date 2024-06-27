@@ -32,8 +32,8 @@ export default {
   data() {
     return {
       loginForm: {
-        code: '',
-        password: '',
+        code: 'tester',
+        password: '123456789',
         type: 'dean'
       },
       loading: false

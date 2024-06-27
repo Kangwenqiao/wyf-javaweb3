@@ -33,7 +33,7 @@
         <el-form-item label="工号" prop="code">
           <el-input v-model="teacherForm.code"></el-input>
         </el-form-item>
-        <el-form-item v-if="!teacherForm.id" label="密码" prop="password">
+        <el-form-item label="密码" prop="password">
           <el-input type="password" v-model="teacherForm.password"></el-input>
         </el-form-item>
         <el-form-item label="学院" prop="collegeId">
@@ -119,7 +119,6 @@ export default {
     fetchTeachers() {
       apiClient.get('/teacher/all')
           .then(response => {
-            console.log('Fetched teachers:', response.data); // Debug line
             this.teachers = response.data.map(item => ({
               id: item.teacher.id,
               name: item.teacher.name,
@@ -153,7 +152,7 @@ export default {
       this.dialogVisible = true;
     },
     editTeacher(teacher) {
-      this.teacherForm = { ...teacher, password: '' }; // Clear password field
+      this.teacherForm = {...teacher, password: ''}; // Clear password field
       this.dialogVisible = true;
     },
     saveTeacher() {

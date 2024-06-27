@@ -34,7 +34,7 @@
         <el-form-item label="学号" prop="code">
           <el-input v-model="studentForm.code"></el-input>
         </el-form-item>
-        <el-form-item v-if="!studentForm.id" label="密码" prop="password">
+        <el-form-item label="密码" prop="password">
           <el-input type="password" v-model="studentForm.password"></el-input>
         </el-form-item>
         <el-form-item label="班级" prop="classId">
@@ -46,12 +46,6 @@
                 :value="classGroup.id"
             ></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="专业" prop="speciality">
-          <el-input v-model="studentForm.speciality"></el-input>
-        </el-form-item>
-        <el-form-item label="学院" prop="college">
-          <el-input v-model="studentForm.college"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveStudent">保存</el-button>
@@ -76,9 +70,7 @@ export default {
         name: '',
         code: '',
         password: '123456789', // 默认密码
-        classId: '',
-        speciality: '',
-        college: ''
+        classId: ''
       },
       dialogVisible: false,
       search: '',
@@ -86,9 +78,7 @@ export default {
         name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
         code: [{required: true, message: '请输入学号', trigger: 'blur'}],
         password: [{required: true, message: '请输入密码', trigger: 'blur'}],
-        classId: [{required: true, message: '请选择班级', trigger: 'change'}],
-        speciality: [{required: true, message: '请输入专业', trigger: 'blur'}],
-        college: [{required: true, message: '请输入学院', trigger: 'blur'}]
+        classId: [{required: true, message: '请选择班级', trigger: 'change'}]
       }
     };
   },
@@ -126,9 +116,7 @@ export default {
         name: '',
         code: '',
         password: '123456789', // 默认密码
-        classId: '',
-        speciality: '',
-        college: ''
+        classId: ''
       };
       this.dialogVisible = true;
     },
