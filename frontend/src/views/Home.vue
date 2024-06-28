@@ -1,8 +1,12 @@
 <template>
+  <!-- 主容器，包含整个主页页面 -->
   <div class="home">
+    <!-- 欢迎标题 -->
     <h1>欢迎使用计算机学院管理系统</h1>
     <p>赋能未来创新者</p>
+    <!-- 功能模块容器 -->
     <div class="features">
+      <!-- 本院学生模块 -->
       <div class="feature">
         <h2>本院学生</h2>
         <p v-if="students.length">总数：{{ students.length }}</p>
@@ -13,6 +17,7 @@
           </el-carousel-item>
         </el-carousel>
       </div>
+      <!-- 本院教学人员模块 -->
       <div class="feature">
         <h2>本院教学人员</h2>
         <p v-if="teachers.length">总数：{{ teachers.length }}</p>
@@ -23,6 +28,7 @@
           </el-carousel-item>
         </el-carousel>
       </div>
+      <!-- 本院行政人员模块 -->
       <div class="feature">
         <h2>本院行政人员</h2>
         <p v-if="deans.length">总数：{{ deans.length }}</p>
@@ -38,42 +44,51 @@
 </template>
 
 <script>
-import axios from 'axios';
+import studentService from '@/services/studentService';
+import teacherService from '@/services/teacherService';
+import deanService from '@/services/deanService';
 
 export default {
   name: 'HomeView',
   data() {
     return {
+      // 存储学生信息
       students: [],
+      // 存储教师信息
       teachers: [],
+      // 存储院长信息
       deans: [],
     };
   },
   created() {
+    // 组件创建时获取学生、教师和院长信息
     this.fetchStudents();
     this.fetchTeachers();
     this.fetchDeans();
   },
   methods: {
+    // 获取学生信息
     async fetchStudents() {
       try {
-        const response = await axios.get('http://localhost:8080/students');
+        const response = await studentService.fetchStudents();
         this.students = response.data;
       } catch (error) {
         console.error('获取学生数据时出错:', error);
       }
     },
+    // 获取教师信息
     async fetchTeachers() {
       try {
-        const response = await axios.get('http://localhost:8080/teacher/all');
+        const response = await teacherService.fetchTeachers();
         this.teachers = response.data;
       } catch (error) {
         console.error('获取教师数据时出错:', error);
       }
     },
+    // 获取院长信息
     async fetchDeans() {
       try {
-        const response = await axios.get('http://localhost:8080/dean/all');
+        const response = await deanService.fetchDeans();
         this.deans = response.data;
       } catch (error) {
         console.error('获取院长数据时出错:', error);

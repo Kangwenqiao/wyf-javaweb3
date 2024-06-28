@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 定义Mapper接口的命名空间，对应Java接口中的包名 -->
 <mapper namespace="com.mw.education.dao.ClassCourseMapper">
 
+    <!-- 定义结果映射，用于将数据库查询结果映射到ClassCourse对象 -->
     <resultMap id="BaseResultMap" type="com.mw.education.domain.ClassCourse">
+        <!-- 映射id字段 -->
         <id column="id" property="id" jdbcType="INTEGER"/>
+        <!-- 映射class_id字段到classId属性 -->
         <result column="class_id" property="classId" jdbcType="INTEGER"/>
+        <!-- 映射course_id字段到courseId属性 -->
         <result column="course_id" property="courseId" jdbcType="INTEGER"/>
     </resultMap>
 
+    <!-- 定义基础列列表，用于在SQL中包含这些列 -->
     <sql id="Base_Column_List">
         id, class_id, course_id
     </sql>
 
+    <!-- 根据id查询单个ClassCourse信息 -->
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List" />
@@ -20,22 +27,26 @@
         where id = #{id,jdbcType=INTEGER}
     </select>
 
+    <!-- 查询所有ClassCourse信息 -->
     <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from class_course
     </select>
 
+    <!-- 根据id删除ClassCourse信息 -->
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from class_course
         where id = #{id,jdbcType=INTEGER}
     </delete>
 
+    <!-- 插入新的ClassCourse信息 -->
     <insert id="insert" parameterType="com.mw.education.domain.ClassCourse">
         insert into class_course (class_id, course_id)
         values (#{classId,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER})
     </insert>
 
+    <!-- 根据id更新ClassCourse信息 -->
     <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.ClassCourse">
         update class_course
         set class_id = #{classId,jdbcType=INTEGER},
@@ -43,6 +54,7 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
 
+    <!-- 根据class_id查询ClassCourse信息，新增的方法 -->
     <!-- 新增的 selectByClassId 方法的映射 -->
     <select id="selectByClassId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -51,6 +63,7 @@
         where class_id = #{classId,jdbcType=INTEGER}
     </select>
 
+    <!-- 根据class_id删除ClassCourse信息 -->
     <delete id="deleteByClassId" parameterType="java.lang.Integer">
         DELETE FROM class_course WHERE class_id = #{classId}
     </delete>

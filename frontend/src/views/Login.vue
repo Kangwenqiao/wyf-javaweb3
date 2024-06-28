@@ -1,7 +1,9 @@
 <template>
+  <!-- 主容器，包含整个登录页面 -->
   <div class="login-container">
     <div class="login-card">
       <h2 class="login-title">用户登录</h2>
+      <!-- 登录表单 -->
       <el-form :model="loginForm" @submit.prevent="onSubmit" ref="loginForm">
         <el-form-item label="工号" prop="code" :rules="[{ required: true, message: '请输入工号', trigger: 'blur' }]">
           <el-input v-model="loginForm.code" autocomplete="off" placeholder="请输入工号"></el-input>
@@ -31,26 +33,32 @@ export default {
   name: 'UserLogin',
   data() {
     return {
+      // 登录表单数据
       loginForm: {
-        code: 'tester',
-        password: '123456789',
-        type: 'dean'
+        code: '',
+        password: '',
+        type: ''
       },
+      // 登录按钮加载状态
       loading: false
     };
   },
   methods: {
+    // 提交表单
     onSubmit() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
+          // 发送登录请求
           apiClient.post('/login', this.loginForm)
               .then(response => {
                 this.loading = false;
                 if (response.data.code === 200) {
+                  // 存储用户信息到本地存储
                   localStorage.setItem('user-code', this.loginForm.code);
                   localStorage.setItem('user-type', this.loginForm.type);
                   localStorage.setItem('user-id', response.data.id); // Assuming backend returns user ID
+                  // 跳转到主页
                   this.$router.push('/');
                 } else {
                   this.$message.error('登录失败: ' + response.data.msg);

@@ -1,12 +1,16 @@
 <template>
+  <!-- 主容器，包含整个班级管理页面 -->
   <div class="class-management">
+    <!-- 增加班级按钮 -->
     <el-button type="primary" @click="openAddClassDialog">增加班级</el-button>
+    <!-- 搜索框 -->
     <el-input
         v-model="search"
-        size="mini"
+        size="default"
         placeholder="输入关键字搜索"
         style="margin: 20px 0;"
     />
+    <!-- 班级信息表格 -->
     <el-table :data="filteredClasses" style="width: 100%">
       <el-table-column prop="classGroup.name" label="班级名称" width="180"></el-table-column>
       <el-table-column prop="classGroup.code" label="班级代码" width="180"></el-table-column>
@@ -14,6 +18,7 @@
       <el-table-column prop="speciality.grade" label="专业年级" width="180"></el-table-column>
       <el-table-column prop="college.name" label="学院名称" width="180"></el-table-column>
       <el-table-column label="操作" width="300">
+        <!-- 操作按钮：编辑、删除、分配课程 -->
         <template v-slot="scope">
           <el-button @click="editClass(scope.row)" type="primary" size="small">编辑</el-button>
           <el-button @click="deleteClass(scope.row.classGroup.id)" type="danger" size="small">删除</el-button>
@@ -58,6 +63,7 @@
         <el-table-column prop="term.name" label="学期" width="180"></el-table-column>
         <el-table-column prop="course.remark" label="课程备注" width="180"></el-table-column>
         <el-table-column label="操作" width="180">
+          <!-- 课程删除按钮 -->
           <template v-slot="scope">
             <el-button @click="removeCourse(scope.row.id)" type="danger" size="small">删除</el-button>
           </template>
@@ -83,14 +89,17 @@
 </template>
 
 <script>
-import apiClient from '@/services/api';
+import classapiService from '@/services/classapiService';
 
 export default {
   name: 'ClassManagement',
   data() {
     return {
+      // 班级列表数据
       classes: [],
+      // 专业列表数据
       specialities: [],
+      // 班级表单数据
       classForm: {
         id: null,
         name: '',
@@ -98,13 +107,20 @@ export default {
         specialityId: null,
         remark: ''
       },
+      // 对话框可见性控制
       dialogVisible: false,
       assignCourseDialogVisible: false,
+      // 当前选中的班级ID
       selectedClassId: null,
+      // 已分配课程列表
       assignedCourses: [],
+      // 可选课程列表
       availableCourses: [],
+      // 当前选中的课程ID
       selectedCourseId: null,
+      // 搜索关键字
       search: '',
+      // 表单验证规则
       rules: {
         name: [{ required: true, message: '请输入班级名称', trigger: 'blur' }],
         code: [{ required: true, message: '请输入班级代码', trigger: 'blur' }],
@@ -114,13 +130,15 @@ export default {
     };
   },
   computed: {
+    // 根据搜索关键字过滤班级列表
     filteredClasses() {
       return this.classes.filter(cls => !this.search || cls.classGroup.name.toLowerCase().includes(this.search.toLowerCase()));
     }
   },
   methods: {
+    // 获取班级数据
     fetchClasses() {
-      apiClient.get('/class/joined/all')
+      classapiService.fetchClasses()
           .then(response => {
             this.classes = response.data;
           })
@@ -128,8 +146,9 @@ export default {
             console.error('获取班级信息时出错:', error);
           });
     },
+    // 获取专业数据
     fetchSpecialities() {
-      apiClient.get('/speciality/all')
+      classapiService.fetchSpecialities()
           .then(response => {
             this.specialities = response.data;
           })
@@ -137,6 +156,7 @@ export default {
             console.error('获取专业信息时出错:', error);
           });
     },
+    // 打开增加班级对话框
     openAddClassDialog() {
       this.classForm = {
         id: null,
@@ -147,6 +167,7 @@ export default {
       };
       this.dialogVisible = true;
     },
+    // 编辑班级
     editClass(classData) {
       this.classForm = {
         id: classData.classGroup.id,
@@ -157,12 +178,10 @@ export default {
       };
       this.dialogVisible = true;
     },
+    // 保存班级信息
     saveClass() {
       this.$refs.classFormRef.validate((valid) => {
         if (valid) {
-          const apiCall = this.classForm.id ? apiClient.put : apiClient.post;
-          const endpoint = this.classForm.id ? `/class` : '/class';
-
           const classData = {
             id: this.classForm.id,
             name: this.classForm.name,
@@ -170,8 +189,7 @@ export default {
             specialityId: this.classForm.specialityId,
             remark: this.classForm.remark
           };
-
-          apiCall(endpoint, classData)
+          classapiService.saveClass(classData)
               .then(() => {
                 this.$message.success('班级信息保存成功');
                 this.dialogVisible = false;
@@ -187,8 +205,9 @@ export default {
         }
       });
     },
+    // 删除班级信息
     deleteClass(id) {
-      apiClient.delete(`/class/${id}`)
+      classapiService.deleteClass(id)
           .then(() => {
             this.$message.success('班级信息删除成功');
             this.fetchClasses(); // 删除成功后刷新数据
@@ -202,40 +221,26 @@ export default {
             }
           });
     },
+    // 分配课程
     assignCourse(classId) {
       this.selectedClassId = classId;
       this.assignCourseDialogVisible = true;
       this.fetchAssignedCourses(classId);
       this.fetchAvailableCourses();
     },
+    // 获取已分配课程数据
     fetchAssignedCourses(classId) {
-      apiClient.get(`/classCourse/getByClassId/${classId}`)
-          .then(response => {
-            const coursePromises = response.data.map(courseAssignment =>
-                apiClient.get(`/courses/${courseAssignment.courseId}`)
-                    .then(courseResponse => {
-                      const course = courseResponse.data;
-                      return apiClient.get(`/terms/${course.termId}`)
-                          .then(termResponse => {
-                            return {
-                              id: courseAssignment.id,
-                              course,
-                              term: termResponse.data
-                            };
-                          });
-                    })
-            );
-            Promise.all(coursePromises)
-                .then(courses => {
-                  this.assignedCourses = courses;
-                });
+      classapiService.fetchAssignedCourses(classId)
+          .then(courses => {
+            this.assignedCourses = courses;
           })
           .catch(error => {
             console.error('获取班级课程信息时出错:', error);
           });
     },
+    // 获取可选课程数据
     fetchAvailableCourses() {
-      apiClient.get('/courses')
+      classapiService.fetchAvailableCourses()
           .then(response => {
             this.availableCourses = response.data;
           })
@@ -243,12 +248,19 @@ export default {
             console.error('获取课程信息时出错:', error);
           });
     },
+    // 添加课程
     addCourse() {
+      // 检查课程是否已经分配给该班级
+      if (this.assignedCourses.some(course => course.course.id === this.selectedCourseId)) {
+        this.$message.error('该课程已经分配给该班级');
+        return;
+      }
+
       const courseAssignment = {
         classId: this.selectedClassId,
         courseId: this.selectedCourseId
       };
-      apiClient.post('/classCourse/add', courseAssignment)
+      classapiService.addCourse(courseAssignment)
           .then(() => {
             this.$message.success('课程分配成功');
             this.fetchAssignedCourses(this.selectedClassId);
@@ -258,8 +270,9 @@ export default {
             this.$message.error('课程分配时发生错误');
           });
     },
+    // 删除课程
     removeCourse(assignmentId) {
-      apiClient.delete(`/classCourse/delete/${assignmentId}`)
+      classapiService.removeCourse(assignmentId)
           .then(() => {
             this.$message.success('课程删除成功');
             this.fetchAssignedCourses(this.selectedClassId);
@@ -271,6 +284,7 @@ export default {
     }
   },
   mounted() {
+    // 组件挂载时获取班级和专业数据
     this.fetchClasses();
     this.fetchSpecialities();
   }

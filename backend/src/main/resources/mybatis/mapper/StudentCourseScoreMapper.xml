@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 定义Mapper接口的命名空间，对应Java接口中的包名 -->
 <mapper namespace="com.mw.education.dao.StudentCourseScoreMapper">
 
+    <!-- 定义结果映射，用于将数据库查询结果映射为StudentCourseScore对象 -->
     <resultMap id="BaseResultMap" type="com.mw.education.domain.StudentCourseScore">
+        <!-- 映射数据库中的id列到StudentCourseScore对象的id属性 -->
         <id column="id" property="id" jdbcType="INTEGER"/>
+        <!-- 映射数据库中的student_id列到StudentCourseScore对象的studentId属性 -->
         <result column="student_id" property="studentId" jdbcType="INTEGER"/>
+        <!-- 映射数据库中的course_id列到StudentCourseScore对象的courseId属性 -->
         <result column="course_id" property="courseId" jdbcType="INTEGER"/>
+        <!-- 映射数据库中的score列到StudentCourseScore对象的score属性 -->
         <result column="score" property="score" jdbcType="DECIMAL"/>
+        <!-- 映射数据库中的remark列到StudentCourseScore对象的remark属性 -->
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <!-- 定义Base_Column_List，包含所有列，用于在查询时引用 -->
     <sql id="Base_Column_List">
         id, student_id, course_id, score, remark
     </sql>
 
+    <!-- 根据id查询单个StudentCourseScore信息 -->
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List" />
@@ -22,22 +31,26 @@
         where id = #{id,jdbcType=INTEGER}
     </select>
 
+    <!-- 查询所有StudentCourseScore信息 -->
     <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from student_course_score
     </select>
 
+    <!-- 根据id删除单个StudentCourseScore信息 -->
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from student_course_score
         where id = #{id,jdbcType=INTEGER}
     </delete>
 
+    <!-- 插入一个新的StudentCourseScore信息 -->
     <insert id="insert" parameterType="com.mw.education.domain.StudentCourseScore">
         insert into student_course_score (student_id, course_id, score, remark)
         values (#{studentId,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER}, #{score,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR})
     </insert>
 
+    <!-- 根据id更新单个StudentCourseScore信息 -->
     <update id="updateByPrimaryKey" parameterType="com.mw.education.domain.StudentCourseScore">
         update student_course_score
         set student_id = #{studentId,jdbcType=INTEGER},

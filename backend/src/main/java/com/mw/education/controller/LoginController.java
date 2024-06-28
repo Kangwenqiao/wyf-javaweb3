@@ -51,6 +51,12 @@ public class LoginController {
         }
     }
 
+    /**
+     * 登录接口
+     * @param loginData 包含用户登录信息的对象
+     * @param session HttpSession对象
+     * @return AjaxResult 包含登录结果的对象
+     */
     @RequestMapping(path = "/login", method = {RequestMethod.GET, RequestMethod.POST})
     public AjaxResult login(@RequestBody LoginData loginData, HttpSession session) {
         System.out.println("Login attempt with code: " + loginData.getCode() + ", type: " + loginData.getType());
@@ -72,8 +78,6 @@ public class LoginController {
             return AjaxResult.error().code(400).msg("Invalid login type");
         }
 
-
-
         if (count == 0) {
             System.out.println("Invalid code or password");
             return AjaxResult.error().code(401).msg("Invalid code or password");
@@ -85,12 +89,22 @@ public class LoginController {
         }
     }
 
+    /**
+     * 登出接口
+     * @param session HttpSession对象
+     * @return AjaxResult 包含登出结果的对象
+     */
     @GetMapping("/logout")
     public AjaxResult logout(HttpSession session) {
         session.invalidate();
         return AjaxResult.success().msg("Logout successful");
     }
 
+    /**
+     * 获取登录信息接口
+     * @param session HttpSession对象
+     * @return AjaxResult 包含登录信息的对象
+     */
     @GetMapping("/login-info")
     public AjaxResult loginInfo(HttpSession session) {
         Map<String, Object> map = new HashMap<>();

@@ -28,57 +28,74 @@ import apiClient from '@/services/api';
 export default {
   data() {
     return {
+      // 默认激活的菜单项
       activeIndex: '1',
+      // 检查用户是否已登录
       isLoggedIn: !!localStorage.getItem('user-code'),
+      // 检查用户类型：院长
       isDean: localStorage.getItem('user-type') === 'dean',
+      // 检查用户类型：学生
       isStudent: localStorage.getItem('user-type') === 'student',
+      // 检查用户类型：教师
       isTeacher: localStorage.getItem('user-type') === 'teacher'
     };
   },
   methods: {
     handleSelect(key, keyPath) {
+      // 处理菜单项被选中事件
       console.log(key, keyPath);
     },
     goHome() {
+      // 跳转到主页并激活相应的菜单项
       this.$router.push('/');
       this.activeIndex = '1';
     },
     goTeacherManagement() {
+      // 跳转到教师管理页面并激活相应的菜单项
       this.$router.push('/teacherManagement');
       this.activeIndex = '2';
     },
     goStudentManagement() {
+      // 跳转到学生管理页面并激活相应的菜单项
       this.$router.push('/studentManagement');
       this.activeIndex = '3';
     },
     goDeanManagement() {
+      // 跳转到教务管理页面并激活相应的菜单项
       this.$router.push('/deanManagement');
       this.activeIndex = '4';
     },
     goClassManagement() {
+      // 跳转到班级管理页面并激活相应的菜单项
       this.$router.push('/classManagement');
       this.activeIndex = '5';
     },
     goStudentInfo() {
+      // 跳转到学生信息页面并激活相应的菜单项
       this.$router.push('/studentInfo');
       this.activeIndex = '6';
     },
     goStudentCourseManagement() {
+      // 跳转到我的课程与成绩页面并激活相应的菜单项
       this.$router.push('/studentCourseManagement');
       this.activeIndex = '7';
     },
     goTeacherInfo() {
+      // 跳转到教师信息页面并激活相应的菜单项
       this.$router.push('/teacherInfo');
       this.activeIndex = '8';
     },
     goLogin() {
+      // 跳转到登录页面
       this.$router.push('/login');
       this.activeIndex = '9';
     },
     logout() {
+      // 用户注销
       apiClient.get('/logout')
           .then(response => {
             if (response.data.code === 200) {
+              // 注销成功
               localStorage.removeItem('user-code');
               localStorage.removeItem('user-type');
               this.isLoggedIn = false;
@@ -88,6 +105,7 @@ export default {
               this.$router.push('/login');
               this.$message.success('注销成功');
             } else {
+              // 注销失败
               this.$message.error('注销失败: ' + response.data.msg);
             }
           })
@@ -99,6 +117,7 @@ export default {
   },
   watch: {
     $route() {
+      // 监视路由变化以更新用户状态
       this.isLoggedIn = !!localStorage.getItem('user-code');
       this.isDean = localStorage.getItem('user-type') === 'dean';
       this.isStudent = localStorage.getItem('user-type') === 'student';
@@ -123,3 +142,4 @@ export default {
   margin-right: 8px;
 }
 </style>
+

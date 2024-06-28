@@ -1,13 +1,18 @@
 <template>
+  <!-- 主容器，包含整个学生管理页面 -->
   <div class="student-management">
+    <!-- 获取所有学生信息按钮 -->
     <el-button type="primary" @click="fetchStudents">获取所有学生信息</el-button>
+    <!-- 添加学生按钮 -->
     <el-button type="success" @click="openAddStudentDialog">添加学生</el-button>
+    <!-- 搜索框 -->
     <el-input
         v-model="search"
-        size="mini"
+        size="default"
         placeholder="输入关键字搜索"
         style="margin: 20px 0;"
     />
+    <!-- 学生信息表格 -->
     <el-table
         :data="students.filter(student => !search || student.name.toLowerCase().includes(search.toLowerCase()))"
         style="width: 100%">
@@ -18,6 +23,7 @@
       <el-table-column prop="specialityName" label="专业" width="180"></el-table-column>
       <el-table-column prop="collegeName" label="学院" width="180"></el-table-column>
       <el-table-column label="操作" width="180">
+        <!-- 操作按钮：编辑、删除 -->
         <template v-slot="scope">
           <el-button @click="editStudent(scope.row)" type="primary" size="small">编辑</el-button>
           <el-button @click="deleteStudent(scope.row.id)" type="danger" size="small">删除</el-button>
@@ -57,14 +63,17 @@
 </template>
 
 <script>
-import apiClient from '@/services/api';
+import studentService from '@/services/studentService';
 
 export default {
   name: 'StudentManagement',
   data() {
     return {
+      // 存储学生信息
       students: [],
+      // 存储班级信息
       classGroups: [],
+      // 学生表单数据
       studentForm: {
         id: null,
         name: '',
@@ -72,8 +81,11 @@ export default {
         password: '123456789', // 默认密码
         classId: ''
       },
+      // 对话框可见性控制
       dialogVisible: false,
+      // 搜索关键字
       search: '',
+      // 表单验证规则
       rules: {
         name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
         code: [{required: true, message: '请输入学号', trigger: 'blur'}],
@@ -83,8 +95,9 @@ export default {
     };
   },
   methods: {
+    // 获取学生信息
     fetchStudents() {
-      apiClient.get('/students')
+      studentService.fetchStudents()
           .then(response => {
             this.students = response.data.map(item => ({
               id: item.student.id,
@@ -101,8 +114,9 @@ export default {
             console.error('获取学生信息时出错:', error);
           });
     },
+    // 获取班级信息
     fetchClassGroups() {
-      apiClient.get('/class/all')
+      studentService.fetchClassGroups()
           .then(response => {
             this.classGroups = response.data;
           })
@@ -110,6 +124,7 @@ export default {
             console.error('获取班级信息时出错:', error);
           });
     },
+    // 打开添加学生对话框
     openAddStudentDialog() {
       this.studentForm = {
         id: null,
@@ -120,17 +135,16 @@ export default {
       };
       this.dialogVisible = true;
     },
+    // 编辑学生信息
     editStudent(student) {
-      this.studentForm = {...student, password: ''}; // Clear password field
+      this.studentForm = {...student, password: ''}; // 清除密码字段
       this.dialogVisible = true;
     },
+    // 保存学生信息
     saveStudent() {
       this.$refs.studentFormRef.validate((valid) => {
         if (valid) {
-          const apiCall = this.studentForm.id ? apiClient.put : apiClient.post;
-          const endpoint = this.studentForm.id ? `/students/${this.studentForm.id}` : '/students';
-
-          apiCall(endpoint, this.studentForm)
+          studentService.saveStudent(this.studentForm)
               .then(() => {
                 this.$message.success('学生信息保存成功');
                 this.dialogVisible = false;
@@ -146,13 +160,14 @@ export default {
         }
       });
     },
+    // 删除学生信息
     deleteStudent(id) {
       this.$confirm('此操作将永久删除该学生, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        apiClient.delete(`/students/${id}`)
+        studentService.deleteStudent(id)
             .then(() => {
               this.$message.success('学生信息删除成功');
               this.fetchStudents(); // 删除成功后刷新数据
@@ -167,6 +182,7 @@ export default {
     }
   },
   mounted() {
+    // 组件挂载时获取学生和班级信息
     this.fetchStudents();
     this.fetchClassGroups();
   }
